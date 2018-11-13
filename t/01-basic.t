@@ -4,7 +4,6 @@ use File::Path;
 use Data::Dumper qw(Dumper);
 use Test::NoWarnings;
 use Test::Output;
-use lib '/Users/stevedondley/perl/modules/Dancer2/lib';
 use Plack::Test;
 use HTTP::Request::Common;
 use Test::Most tests => 1, 'die';
