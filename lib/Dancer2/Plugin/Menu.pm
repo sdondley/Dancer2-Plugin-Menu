@@ -3,19 +3,29 @@ use 5.010; use strict; use warnings;
 
 # ABSTRACT: Automatically generate an HTML menu for your Dancer2 app
 
+use Storable     'dclone';
+use List::Util   'first';
+use Data::Dumper 'Dumper';
+use HTML::Element;
 use Dancer2::Plugin;
 use Dancer2::Core::Hook;
-use Data::Dumper qw(Dumper);
-use Storable qw (dclone);
-use HTML::Element;
-use List::Util 'first';
 
 plugin_keywords qw ( menu_item );
 
-has 'tree'       => ( is => 'rw', default => sub { { '/' => { children => {} } } } );
-has 'html'       => ( is => 'rw', predicate => 1,);
-has 'clean_tree' => ( is => 'rw', predicate => 1,);
+### ATTRIBUTES ###
+# tree is the current active tree with "active" tags
+# clean_tree is tree without "active" tags, used to easily reset tree
+# html contains HTML generated from the tree
 
+# Separting the HTML from a logical data structure is probably slightly more
+# expensive but makes the code cleaner and easier to follow.
+
+has 'tree'       => ( is => 'rw', default => sub { { '/' => { children => {} } } } );
+has 'clean_tree' => ( is => 'rw', predicate => 1,);
+has 'html'       => ( is => 'rw', predicate => 1,);
+###################
+
+# set up before_template hook to make the menu dynamic using "active" property
 sub BUILD {
   my $s = shift;
 
@@ -24,22 +34,24 @@ sub BUILD {
     code => sub {
       my $tokens = shift;
       my $route = $tokens->{request}->route;
+
+      # init or reset the trees
       if (!$s->has_clean_tree) {
         $s->clean_tree(dclone $s->tree);
       } else {
         $s->tree(dclone $s->clean_tree);
       }
-      my @segments = split /\//, $route->spec_route;
-      shift @segments;
 
-      # set active
+      # set active menu items
+      my @segments = split /\//, $route->spec_route;
+      shift @segments; # get rid of blank segment
       my $tree = $s->tree->{'/'};
       foreach my $segment (@segments) {
         $tree->{children}{$segment}{active} = 1;
         $tree = $tree->{children}{$segment};
       }
 
-      # generate html
+      # tear down and regenerate html and send to template
       $s->html( HTML::Element->new('ul') );
       _get_menu($s->tree->{'/'}, $s->html);
       $tokens->{menu} = $s->html->as_HTML('', "\t", {});
@@ -47,11 +59,14 @@ sub BUILD {
   ));
 }
 
+# init the tree; called for each route wrapped in the menu_item keyword
 sub menu_item {
   my ($s, $xt_data, $route) = @_;
   my @segments = split /\//, $route->spec_route;
   my $tree = $s->tree;
-  $segments[0] = '/';
+  $segments[0] = '/'; # replace blank segment with root segment
+
+  # add the path segments and associated data to our tree
   while (my $segment = shift @segments) {
     if ($s->tree->{$segment}) {
       if (!@segments) {
@@ -80,18 +95,21 @@ sub menu_item {
   }
 }
 
+# generate the HTML based on the contents of the tree
 sub _get_menu {
   my ($tree, $element) = @_;
 
+  # sort sibling children menu items by weight and then by name
   foreach my $child ( sort { ($tree->{children}{$a}{weight} || 5) <=> ($tree->{children}{$b}{weight} || 5)
                       || $tree->{children}{$a}{title} cmp $tree->{children}{$b}{title} } keys %{$tree->{children}} ) {
 
+    # list item for the menu item
     my $li_this = HTML::Element->new('li');
 
-    # set classes for breadcrumbs and css styling
+    # set "active" class for breadcrumbs and css styling
     $li_this->attr(class => $tree->{children}{$child}{active} ? 'active' : '');
 
-    # recurse
+    # add additional HTML element(s); recurse if menu item has children itself
     if ($tree->{children}{$child}{children}) {
       $li_this->push_content($tree->{children}{$child}{title});
       my $ul      = HTML::Element->new('ul');
@@ -105,7 +123,6 @@ sub _get_menu {
   }
   return $element;
 }
-
 
 1; # Magic true value
 
@@ -140,15 +157,20 @@ In your template file:
 This will generage a hierarchical menu that will look like this when the
 C<path/menu1> route is visted:
 
-  <uL><ul><li class="active">Path<li class="active">My Child1 Item<li>My Child2 Item</li></ul></ul>
+  <ul><li class="active">Path
+      <ul><li class="active">My Child1 Item</li>
+          <li>My Child2 Item</li>
+      </ul>
+  </ul>
 
 =head1 DESCRIPTION
 
 This module generates HTML for routes wrapped in the C<menu_item> keyword. Menu
-items will be injected into the template containing where the C<E<lt>% menu
-%E<gt>> tag is located. Parent menu items are assigned to the C<E<lt>ul%E<gt>>
-HTML tag and child are inside C<E<lt>li%E<gt>> tags. Menu items that are within
-the current route are given the C<active> class so they can be styled.
+items will be injected into the template wherever the C<E<lt>% menu %E<gt>> tag
+is located. Child menu items are wrapped in C<E<lt>li%E<gt>> HTML tags which are
+themselves wrapped in a C<E<lt>ul%E<gt>> tag associated with the parent menu
+item. Menu items within the current route are given the C<active> class so they
+can be styled.
 
 The module is in early development stages and currently has few options. It has
 not been heavily tested and there are likely bugs especially with dynaimc paths
@@ -167,18 +189,18 @@ will "sink" to the bottom compared to sibling menu items sharing the same level
 within the hierarchy. If two sibling menu items have the same weight, the menu
 items will be ordered alphabetically.
 
-Menu items that are not endpoints in the route or that are not supplied with a
-title, will have a title automatically generated according to their segment
-name. For example, this route:
+Menu items that are not endpoints in the route or that don't have a C<title>,
+will automatically generate a title according to the path segment's name. For
+example, this route:
 
   /categories/fun food/desserts
 
 Will be converted to a hierachy of menu items entitled C<Categories>, C<Fun
 food>, and C<Desserts>. Note that captialization is automatically added.
 Automatic titles will be overridden with endpoint specific titles if they are
-supplied later in the app.
+supplied in a later C<menu_item> call.
 
-If no weight is supplied it will default to a value of C<5>.
+If the C<weight> is not supplied it will default to a value of C<5>.
 
 =head1 CONFIGURATION
 
