@@ -1,6 +1,6 @@
-Revision history for {{$dist->name}}
+Revision history for Dancer2-Plugin-Menu
 
-{{$NEXT}}
+0.005     2018-11-13 11:24:27-05:00 America/New_York
   - Tighten up code/documentation/improve code comments
 
 0.004     2018-11-13 03:05:36-05:00 America/New_York

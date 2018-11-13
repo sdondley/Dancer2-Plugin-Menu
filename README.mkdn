@@ -1,6 +1,6 @@
 # VERSION
 
-version 0.004
+version 0.005
 
 # SYNOPSIS
 
@@ -31,15 +31,20 @@ In your template file:
 This will generage a hierarchical menu that will look like this when the
 `path/menu1` route is visted:
 
-    <uL><ul><li class="active">Path<li class="active">My Child1 Item<li>My Child2 Item</li></ul></ul>
+    <ul><li class="active">Path
+        <ul><li class="active">My Child1 Item</li>
+            <li>My Child2 Item</li>
+        </ul>
+    </ul>
 
 # DESCRIPTION
 
 This module generates HTML for routes wrapped in the `menu_item` keyword. Menu
-items will be injected into the template containing where the `<% menu
-%>` tag is located. Parent menu items are assigned to the `<ul%>`
-HTML tag and child are inside `<li%>` tags. Menu items that are within
-the current route are given the `active` class so they can be styled.
+items will be injected into the template wherever the `<% menu %>` tag
+is located. Child menu items are wrapped in `<li%>` HTML tags which are
+themselves wrapped in a `<ul%>` tag associated with the parent menu
+item. Menu items within the current route are given the `active` class so they
+can be styled.
 
 The module is in early development stages and currently has few options. It has
 not been heavily tested and there are likely bugs especially with dynaimc paths
@@ -66,18 +71,18 @@ will "sink" to the bottom compared to sibling menu items sharing the same level
 within the hierarchy. If two sibling menu items have the same weight, the menu
 items will be ordered alphabetically.
 
-Menu items that are not endpoints in the route or that are not supplied with a
-title, will have a title automatically generated according to their segment
-name. For example, this route:
+Menu items that are not endpoints in the route or that don't have a `title`,
+will automatically generate a title according to the path segment's name. For
+example, this route:
 
     /categories/fun food/desserts
 
 Will be converted to a hierachy of menu items entitled `Categories`, `Fun
 food`, and `Desserts`. Note that captialization is automatically added.
 Automatic titles will be overridden with endpoint specific titles if they are
-supplied later in the app.
+supplied in a later `menu_item` call.
 
-If no weight is supplied it will default to a value of `5`.
+If the `weight` is not supplied it will default to a value of `5`.
 
 # REQUIRES
 
