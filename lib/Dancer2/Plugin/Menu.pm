@@ -6,7 +6,6 @@ use 5.010; use strict; use warnings;
 use Dancer2::Plugin;
 use Dancer2::Core::Hook;
 use Data::Dumper qw(Dumper);
-use Dancer2::Plugin::Menu::Tree;
 use Storable qw (dclone);
 use HTML::Element;
 use List::Util 'first';
