@@ -1,10 +1,56 @@
-# NAME
-
-Dancer2::Plugin::Menu - Automatically generate an HTML menu for your Dancer2 app
-
 # VERSION
 
-version 0.003
+version 0.004
+
+# SYNOPSIS
+
+In your app:
+
+    use Dancer2;
+    use Dancer2::Plugin::Menu;
+
+    menu_item(
+      { title => 'My Parent Item', weight => 3 },
+      get 'path' => sub { template },
+    );
+
+    menu_item(
+      { title => 'My Child1 Item', weight => 3 },
+      get 'path/menu1' => sub { template },
+    );
+
+    menu_item(
+      { title => 'My Child2 Item', weight => 4 },
+      get 'path/menu2' => sub { template },
+    );
+
+In your template file:
+
+    <% menu %>
+
+This will generage a hierarchical menu that will look like this when the
+`path/menu1` route is visted:
+
+    <uL><ul><li class="active">Path<li class="active">My Child1 Item<li>My Child2 Item</li></ul></ul>
+
+# DESCRIPTION
+
+This module generates HTML for routes wrapped in the `menu_item` keyword. Menu
+items will be injected into the template containing where the `<% menu
+%>` tag is located. Parent menu items are assigned to the `<ul%>`
+HTML tag and child are inside `<li%>` tags. Menu items that are within
+the current route are given the `active` class so they can be styled.
+
+The module is in early development stages and currently has few options. It has
+not been heavily tested and there are likely bugs especially with dynaimc paths
+which are completely untested at this time. The module should work and be
+adqueate for simple menu structures, however.
+
+# CONFIGURATION
+
+Add a `<% menu %>` tag in the appropriate location withing your Dancer2
+template files. If desired, add css for `<li%>` tags in the `active`
+class.
 
 # KEYWORDS
 
@@ -81,6 +127,10 @@ web interface at [https://github.com/sdondley/Dancer2-Plugin-Menu/issues](https:
 # INSTALLATION
 
 See perlmodinstall for information and options on installing Perl modules.
+
+# SEE ALSO
+
+[Dancer2](https://metacpan.org/pod/Dancer2)
 
 # AUTHOR
 
