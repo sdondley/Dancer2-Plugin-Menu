@@ -108,7 +108,6 @@ sub _get_menu {
 
 
 1; # Magic true value
-# ABSTRACT: this is what the module does
 
 __END__
 

@@ -1,4 +1,7 @@
-Revision history for Dancer2-Plugin-Menu
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+  - Removed second #ABSTRACT commtent to fix missing documentation sections
 
 0.002     2018-11-13 02:48:45-05:00 America/New_York
   - remove crufty packages/files
