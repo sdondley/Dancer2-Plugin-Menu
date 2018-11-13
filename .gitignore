@@ -1,4 +1,3 @@
-/dist.ini
 /MANIFEST.SKIP
 /Dancer2-Plugin-Menu-*
 /tmp
@@ -6,4 +5,5 @@
 *~
 *.swp
 *.swo
-weaver.ini
+*.tgz
+.build
