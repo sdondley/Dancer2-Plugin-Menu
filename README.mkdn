@@ -4,7 +4,7 @@ Dancer2::Plugin::Menu - Automatically generate an HTML menu for your Dancer2 app
 
 # VERSION
 
-version 0.001
+version 0.002
 
 # KEYWORDS
 
@@ -37,7 +37,6 @@ If no weight is supplied it will default to a value of `5`.
 
 - [Dancer2::Core::Hook](https://metacpan.org/pod/Dancer2::Core::Hook)
 - [Dancer2::Plugin](https://metacpan.org/pod/Dancer2::Plugin)
-- [Dancer2::Plugin::Menu::Tree](https://metacpan.org/pod/Dancer2::Plugin::Menu::Tree)
 - [Data::Dumper](https://metacpan.org/pod/Data::Dumper)
 - [HTML::Element](https://metacpan.org/pod/HTML::Element)
 - [List::Util](https://metacpan.org/pod/List::Util)
