@@ -1,4 +1,7 @@
-Revision history for Dancer2-Plugin-Menu
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+  - Fix broken weaver.ini file
 
 0.003     2018-11-13 03:03:08-05:00 America/New_York
   - Removed second #ABSTRACT commtent to fix missing documentation sections
