@@ -22,7 +22,7 @@ plugin_keywords qw ( menu_item );
 
 has 'tree'       => ( is => 'rw', default => sub { { '/' => { children => {} } } } );
 has 'clean_tree' => ( is => 'rw', predicate => 1,);
-has 'html'       => ( is => 'rw', predicate => 1,);
+has 'html'       => ( is => 'rw');
 ###################
 
 # set up before_template hook to make the menu dynamic using "active" property
@@ -32,18 +32,14 @@ sub BUILD {
   $s->app->add_hook (Dancer2::Core::Hook->new (
     name => 'before_template',
     code => sub {
-      my $tokens = shift;
-      my $route = $tokens->{request}->route;
 
-      # init or reset the trees
-      if (!$s->has_clean_tree) {
-        $s->clean_tree(dclone $s->tree);
-      } else {
-        $s->tree(dclone $s->clean_tree);
-      }
+      # reset or init the trees
+      $s->has_clean_tree ? $s->tree(dclone $s->clean_tree)
+                         : $s->clean_tree(dclone $s->tree);
 
       # set active menu items
-      my @segments = split /\//, $route->spec_route;
+      my $tokens = shift;
+      my @segments = split /\//, $tokens->{request}->route->spec_route;
       shift @segments; # get rid of blank segment
       my $tree = $s->tree->{'/'};
       foreach my $segment (@segments) {
@@ -68,30 +64,28 @@ sub menu_item {
 
   # add the path segments and associated data to our tree
   while (my $segment = shift @segments) {
-    if ($s->tree->{$segment}) {
-      if (!@segments) {
-        if ($xt_data) {
-          $tree->{$segment} = $xt_data;
-        } else {
-          $tree->{$segment}{title} = ucfirst($segment);
-        }
-      }
-      $tree = $tree->{$segment}{children};
-    } else {
-      if (!$tree->{$segment}{children}) {
-        $tree->{$segment}{children} = {};
-        if (!@segments) {
-          if ($xt_data) {
-            $tree->{$segment} = $xt_data;
-          } else {
-            $tree->{$segment}{title} = ucfirst($segment);
-          }
-        } else {
-          $tree->{$segment}{title} = ucfirst($segment) if !$tree->{$segment}{title};
-        }
-      }
-      $tree = $tree->{$segment}{children};
+    my $title = ucfirst($segment);
+    my $weight = 5;
+    $xt_data->{title} //= $title;
+    print Dumper $xt_data->{title};
+    $xt_data->{weight} //= $weight;
+
+    # add xt_data to existig terminal segments, grow the tree otherwise
+    if (!@segments && ($s->tree->{$segment} || !$tree->{$segment}{children})) {
+      $tree->{$segment} = $xt_data;
+      $tree->{$segment}{protected} = 1;  # cannot be changed by a different route
+    } elsif (!$s->tree->{$segment} && !$tree->{$segment}{children}) {
+      $tree->{$segment}{children} = {};
     }
+
+    # add menu item data to non-protected items
+    if (!$tree->{$segment}{protected}) {
+      ($title, $weight) = ($xt_data->{title}, $xt_data->{weight}) if !@segments;
+      $tree->{$segment}{title} = $title;
+      $tree->{$segment}{weight} = $weight;
+      $tree->{$segment}{protected} = !@segments;
+    }
+    $tree = $tree->{$segment}{children};
   }
 }
 
@@ -100,24 +94,23 @@ sub _get_menu {
   my ($tree, $element) = @_;
 
   # sort sibling children menu items by weight and then by name
-  foreach my $child ( sort { ($tree->{children}{$a}{weight} || 5) <=> ($tree->{children}{$b}{weight} || 5)
-                      || $tree->{children}{$a}{title} cmp $tree->{children}{$b}{title} } keys %{$tree->{children}} ) {
+  foreach my $child (
+    sort { ( $tree->{children}{$a}{weight} <=> $tree->{children}{$b}{weight} )
+      ||   ( $tree->{children}{$a}{title}  cmp $tree->{children}{$b}{title}  )
+         } keys %{$tree->{children}} ) {
 
-    # list item for the menu item
+    # create menu item list element with classes for css styling
     my $li_this = HTML::Element->new('li');
-
-    # set "active" class for breadcrumbs and css styling
     $li_this->attr(class => $tree->{children}{$child}{active} ? 'active' : '');
 
-    # add additional HTML element(s); recurse if menu item has children itself
+    # add HTML elements for menu item; recurse if menu item has children itself
+    $li_this->push_content($tree->{children}{$child}{title});
     if ($tree->{children}{$child}{children}) {
-      $li_this->push_content($tree->{children}{$child}{title});
       my $ul      = HTML::Element->new('ul');
       $li_this->push_content($ul);
       $element->push_content($li_this);
       _get_menu($tree->{children}{$child}, $ul)
     } else {
-      $li_this->push_content($tree->{children}{$child}{title});
       $element->push_content($li_this);
     }
   }
@@ -154,7 +147,7 @@ In your template file:
 
   <% menu %>
 
-This will generage a hierarchical menu that will look like this when the
+This will generate a hierarchical menu that will look like this when the
 C<path/menu1> route is visted:
 
   <ul><li class="active">Path
@@ -183,11 +176,11 @@ Wraps a conventional route handler preceded by a required hash reference
 containing data that will be applied to the route's endpoint.
 
 Two keys can be supplied in the hash reference: a C<title> for the menu item and
-a weight. The title will be used as the content for the menu items. The weight
-will determine the order of the menu items. Heavier items (with larger values)
-will "sink" to the bottom compared to sibling menu items sharing the same level
-within the hierarchy. If two sibling menu items have the same weight, the menu
-items will be ordered alphabetically.
+a C<weight>. The C<title> will be used as the content for the menu items. The
+C<weight> will determine the order of the menu items. Heavier items (with larger
+values) will "sink" to the bottom compared to sibling menu items sharing the
+same level within the hierarchy. If two sibling menu items have the same weight,
+the menu items will be ordered alphabetically.
 
 Menu items that are not endpoints in the route or that don't have a C<title>,
 will automatically generate a title according to the path segment's name. For
