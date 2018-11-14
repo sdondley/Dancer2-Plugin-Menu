@@ -1,4 +1,11 @@
-Revision history for Dancer2-Plugin-Menu
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+  - More code tightening and tidying
+  - Ensure default titles are set if not supplied by user
+  - Ensure default weights are set if not supplied by user
+  - Protect menu item data from getting overwritten by other routes
+  - Add missing "Name" section to weaver.ini
 
 0.005     2018-11-13 11:24:27-05:00 America/New_York
   - Tighten up code/documentation/improve code comments
