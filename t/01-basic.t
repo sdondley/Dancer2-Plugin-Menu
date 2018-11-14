@@ -38,7 +38,7 @@ my $app_obj;
 
   menu_item(
     { title => 'Deep One', weight => 3 },
-    get 'test/snig/one/Baloney Pony/three' => sub { template 'index.tt', { html => 'booya' } }
+    get 'test/snig/one/baloney pony/three' => sub { template 'index.tt', { html => 'booya' } }
   );
 
 #  menu_item(
@@ -55,7 +55,7 @@ my $app_obj;
 }
 
 my $test = Plack::Test->create( MyApp->to_app );
-my $res = $test->request( GET 'test/snig/one/Baloney Pony/three' );
+my $res = $test->request( GET 'test/snig/one/baloney pony/three' );
 print Dumper $res->content;
 $res = $test->request( GET 'test' );
 print Dumper $res->content;
