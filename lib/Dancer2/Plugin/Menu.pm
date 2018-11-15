@@ -58,32 +58,38 @@ sub BUILD {
 # init the tree; called for each route wrapped in the menu_item keyword
 sub menu_item {
   my ($s, $xt_data, $route) = @_;
-  my @segments = split /\//, $route->spec_route;
   my $tree = $s->tree;
+  my @segments = split /\//, $route->spec_route;
   $segments[0] = '/'; # replace blank segment with root segment
 
-  # add the path segments and associated data to our tree
+  # add the path segments and associate data with tree nodes
   while (my $segment = shift @segments) {
     my $title = ucfirst($segment);
     my $weight = 5;
     $xt_data->{title} //= $title;
-    print Dumper $xt_data->{title};
     $xt_data->{weight} //= $weight;
 
-    # add xt_data to existig terminal segments, grow the tree otherwise
-    if (!@segments && ($s->tree->{$segment} || !$tree->{$segment}{children})) {
+    # more segments after this one so extend tree if next segment doesn't exist
+    if (@segments) {
+      if (!$tree->{$segment}{children}) {
+        $tree->{$segment}{children} = {};
+      }
+    # add xl_data if we are at the end of a path and therefore route
+    } elsif (!$tree->{$segment}{children}) {
       $tree->{$segment} = $xt_data;
-      $tree->{$segment}{protected} = 1;  # cannot be changed by a different route
-    } elsif (!$s->tree->{$segment} && !$tree->{$segment}{children}) {
-      $tree->{$segment}{children} = {};
+      $tree->{$segment}{protected} = 1;  # don't let other routes overwrite
+      next; # we can bail early on iteration and save 2 zillionths of a second
     }
 
-    # add menu item data to non-protected items
+    # not at the end of an existing path, determine which data to add to tree node
     if (!$tree->{$segment}{protected}) {
-      ($title, $weight) = ($xt_data->{title}, $xt_data->{weight}) if !@segments;
-      $tree->{$segment}{title} = $title;
-      $tree->{$segment}{weight} = $weight;
-      $tree->{$segment}{protected} = !@segments;
+      # if at end of the route, add xt_data; otherwise defaults are used
+      if (!@segments) {
+        ($title, $weight)            = ($xt_data->{title}, $xt_data->{weight});
+        $tree->{$segment}{protected} = 1;
+      }
+      $tree->{$segment}{title}     = $title;
+      $tree->{$segment}{weight}    = $weight;
     }
     $tree = $tree->{$segment}{children};
   }
