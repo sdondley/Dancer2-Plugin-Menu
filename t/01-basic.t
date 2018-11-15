@@ -21,6 +21,13 @@ my $app_obj;
   use Data::Dumper qw(Dumper);
 
   get '/' => sub { return 'hi' };
+
+
+  menu_item(
+    { title => 'Deep One', weight => 3 },
+    get 'test/snig/one/baloney pony/three' => sub { template 'index.tt', { html => 'booya' } }
+  );
+
   menu_item(
     { title => 'My Menu Item', weight => 1 },
     get 'test' => sub { template 'index.tt', { html => 'went_down' } }
@@ -34,11 +41,6 @@ my $app_obj;
   menu_item(
     { title => 'Dinky', weight => 3 },
     get 'test/big' => sub { template },
-  );
-
-  menu_item(
-    { title => 'Deep One', weight => 3 },
-    get 'test/snig/one/baloney pony/three' => sub { template 'index.tt', { html => 'booya' } }
   );
 
 #  menu_item(
