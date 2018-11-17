@@ -62,6 +62,9 @@ print Dumper $res->content;
 $res = $test->request( GET 'test' );
 print Dumper $res->content;
 
+my @warnings = grep { $_->{Message} =~ /fallback to PP version/ } &Test::NoWarnings::warnings;
+&Test::NoWarnings::clear_warnings if @warnings == &Test::NoWarnings::warnings;
+
 
 
 
