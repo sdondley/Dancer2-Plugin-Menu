@@ -1,5 +1,11 @@
 Revision history for Dancer2-Plugin-Menu
 
+0.008     2018-11-19 09:58:21-05:00 America/New_York
+  - improved performance with cache for html menus
+  - fix bug that could cause wrong menu item to get displayed
+  - improve tests
+  - documentation improvements
+
 0.007     2018-11-17 06:55:33-05:00 America/New_York
   - reorder routes in test
   - improve code readability and logic

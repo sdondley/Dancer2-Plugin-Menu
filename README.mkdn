@@ -4,7 +4,7 @@ Dancer2::Plugin::Menu - Automatically generate an HTML menu for your Dancer2 app
 
 # VERSION
 
-version 0.007
+version 0.008
 
 # SYNOPSIS
 
@@ -55,7 +55,7 @@ not been heavily tested and there are likely bugs especially with dynaimc paths
 which are completely untested at this time. The module should work and be
 adqueate for simple menu structures, however.
 
-# KEYWORDS
+## KEYWORDS
 
 ### menu\_item( { \[title => $str\], \[weight => $num\] }, `ROUTE METHOD` `REGEXP`, `CODE`)
 
@@ -93,7 +93,7 @@ class.
 - [Dancer2::Plugin](https://metacpan.org/pod/Dancer2::Plugin)
 - [Data::Dumper](https://metacpan.org/pod/Data::Dumper)
 - [HTML::Element](https://metacpan.org/pod/HTML::Element)
-- [List::Util](https://metacpan.org/pod/List::Util)
+- [MooX::HandlesVia](https://metacpan.org/pod/MooX::HandlesVia)
 - [Storable](https://metacpan.org/pod/Storable)
 - [strict](https://metacpan.org/pod/strict)
 - [warnings](https://metacpan.org/pod/warnings)
