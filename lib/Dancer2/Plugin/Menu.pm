@@ -177,9 +177,9 @@ item. Menu items within the current route are given the C<active> class so they
 can be styled.
 
 The module is in early development stages and currently has few options. It has
-not been heavily tested and there are likely bugs especially with dynaimc paths
+not been heavily tested and there are likely bugs especially with dynamic paths
 which are completely untested at this time. The module should work and be
-adqueate for simple menu structures, however.
+adequate for simple menu structures, however.
 
 =keyword menu_item( { [title => $str], [weight => $num] }, C<ROUTE METHOD> C<REGEXP>, C<CODE>)
 
@@ -198,7 +198,7 @@ example, this route:
 
   /categories/fun food/desserts
 
-is converted to a hierachy of menu items entitled C<Categories>, C<Fun
+is converted to a hierarchy of menu items entitled C<Categories>, C<Fun
 food>, and C<Desserts>. Note that captialization is automatically added.
 Automatic titles will be overridden with endpoint specific titles if they are
 supplied in a later C<menu_item> call.
@@ -207,7 +207,7 @@ If the C<weight> is not supplied it will default to a value of C<5>.
 
 =head1 CONFIGURATION
 
-Add a C<E<lt>% menu %E<gt>> tag in the appropriate location withing your Dancer2
+Add a C<E<lt>% menu %E<gt>> tag in the appropriate location within your Dancer2
 template files. If desired, add css for C<E<lt>li%E<gt>> tags in the C<active>
 class.
 
