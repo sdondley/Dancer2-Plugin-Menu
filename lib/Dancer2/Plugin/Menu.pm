@@ -159,7 +159,7 @@ In your template file:
   <% menu %>
 
 This will generate a hierarchical menu that will look like this when the
-C<path/menu1> route is visted:
+C<path/menu1> route is visited:
 
   <ul><li class="active">Path
       <ul><li class="active">My Child1 Item</li>
@@ -171,8 +171,8 @@ C<path/menu1> route is visted:
 
 This module generates HTML for routes wrapped in the C<menu_item> keyword. Menu
 items will be injected into the template wherever the C<E<lt>% menu %E<gt>> tag
-is located. Child menu items are wrapped in C<E<lt>li%E<gt>> HTML tags which are
-themselves wrapped in a C<E<lt>ul%E<gt>> tag associated with the parent menu
+is located. Child menu items are wrapped in C<E<lt>liE<gt>> HTML tags which are
+themselves wrapped in a C<E<lt>ulE<gt>> tag associated with the parent menu
 item. Menu items within the current route are given the C<active> class so they
 can be styled.
 
@@ -199,7 +199,7 @@ example, this route:
   /categories/fun food/desserts
 
 is converted to a hierarchy of menu items entitled C<Categories>, C<Fun
-food>, and C<Desserts>. Note that captialization is automatically added.
+food>, and C<Desserts>. Note that capitalization is automatically added.
 Automatic titles will be overridden with endpoint specific titles if they are
 supplied in a later C<menu_item> call.
 
@@ -208,7 +208,7 @@ If the C<weight> is not supplied it will default to a value of C<5>.
 =head1 CONFIGURATION
 
 Add a C<E<lt>% menu %E<gt>> tag in the appropriate location within your Dancer2
-template files. If desired, add css for C<E<lt>li%E<gt>> tags in the C<active>
+template files. If desired, add css for C<E<lt>liE<gt>> tags in the C<active>
 class.
 
 =head1 DEPENDENCIES
