@@ -66,9 +66,13 @@ sub menu_item {
 
   # add node for each segment of the path and associate data with it
   while (my $node = shift @nodes) {
-    # set default properties
+    # set menu item data
     my $title            = ucfirst($node);
     my $weight           = 5;
+    if (!@nodes) {
+      $mi_data->{title}         //= $title;
+      $mi_data->{weight}        //= $weight;
+    }
 
     # more nodes after this one so extend tree if next node doesn't already exist
     if (@nodes) {
@@ -77,8 +81,6 @@ sub menu_item {
       }
     # add mi_data if we are at the end of a path and therefore route
     } elsif (!$tree->{$node}{children}) {
-      $mi_data->{title}         //= $title;
-      $mi_data->{weight}        //= $weight;
       $tree->{$node}              = $mi_data;
       $tree->{$node}{protected}   = 1;  # don't let new routes clobber node
       next; # we can bail early on iteration and save 2 zillionths of a second
@@ -88,8 +90,6 @@ sub menu_item {
     if (!$tree->{$node}{protected}) {
       # if at node at end of route, add mi_data; otherwise defaults are used
       if (!@nodes) {
-        $mi_data->{title}         //= $title;
-        $mi_data->{weight}        //= $weight;
         ($title, $weight)           = ($mi_data->{title}, $mi_data->{weight});
         $tree->{$node}{protected}   = 1;
       }
@@ -194,14 +194,10 @@ menu items have the same weight, the menu items will be ordered alphabetically.
 
 Menu items that are not endpoints in the route or that don't have a C<title>,
 will automatically generate a title according to the path segment's name. For
-example, this route:
-
-  /categories/fun food/desserts
-
-is converted to a hierarchy of menu items entitled C<Categories>, C<Fun
-food>, and C<Desserts>. Note that capitalization is automatically added.
-Automatic titles will be overridden with endpoint specific titles if they are
-supplied in a later C<menu_item> call.
+example, the route C</categories/fun food/desserts> is converted to a hierarchy
+of menu items entitled C<Categories>, C<Fun food>, and C<Desserts>. Note that
+capitalization is automatically added.  Automatic titles will be overridden with
+endpoint specific titles if they are supplied in a later C<menu_item> call.
 
 If the C<weight> is not supplied it will default to a value of C<5>.
 
