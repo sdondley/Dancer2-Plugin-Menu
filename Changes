@@ -1,8 +1,9 @@
 Revision history for Dancer2-Plugin-Menu
 
-{{$NEXT}}
+0.009     2018-11-20 04:41:24-05:00 America/New_York
   - typo fixes to POD
   - include route prefix in tests
+  - simplify menu_item code
 
 0.008     2018-11-19 09:58:21-05:00 America/New_York
   - improved performance with cache for html menus
