@@ -26,24 +26,25 @@ my $app_obj;
 
     menu_item(
         { title => 'Deep One', weight => 3 },
-        get 'test/snig/one/baloney pony/three' =>
+        get '/test/snig/one/baloney pony/three' =>
           sub { template 'index.tt', { html => 'booya' } }
     );
 
     menu_item( { title => 'My Menu Item', weight => 1 },
-        get 'test' => sub { template 'index.tt', { html => 'went_down' } } );
+        get '/test' => sub { template 'index.tt', { html => 'went_down' } } );
 
+    prefix '/test';
     menu_item(
         { title => 'A Tom Tom', weight => 3 },
-        get 'test/snig' => sub { template }
+        get '/snig' => sub { template }
     );
 
     menu_item(
         { title => 'Dinky', weight => 3 },
-        get 'test/big' => sub { template },
+        get '/big' => sub { template },
     );
 
-    menu_item( {}, get 'test/nut' => sub { template }, );
+    menu_item( {}, get '/nut' => sub { template }, );
 
 }
 
@@ -56,7 +57,7 @@ $res = $test->request( GET 'test' );
 cmp_deeply( $res->content, $Data::test2, 'returns proper HTML' );
 
 $res = $test->request( GET 'test' );
-cmp_deeply( $res->content, $Data::test2, 'returns proper HTML' );
+cmp_deeply( $res->content, $Data::test2, 'returns proper HTML from cache' );
 
 my $plugin = _dispatch_route('test');
 my $cache  = $plugin->_html_cache;
